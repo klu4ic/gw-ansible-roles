@@ -1,0 +1,47 @@
+---
+
+- name: install Java
+  yum:
+    update_cache: yes
+    name: java-1.8.0-openjdk
+    state: latest 
+  become: yes
+
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+  become: yes
+
+
+- name: Install Docker
+  yum:
+    update_cache: yes 
+    name: docker-ce 
+    state: latest 
+  become: yes
+
+- name: Start and Enable Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: install pip
+  easy_install:
+    name: pip
+    state: latest
+
+- name: pip install docker
+  command: pip install docker --ignore-installed
+
+- name: Install awscli
+  yum:
+    update_cache: yes
+    name: awscli
+    state: latest
+
+- name: pip install awscli
+  command: pip install awscli --ignore-installed
+

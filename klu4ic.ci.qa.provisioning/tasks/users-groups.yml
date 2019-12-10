@@ -1,0 +1,20 @@
+---
+
+- name: Create group
+  group:
+    name: "{{ appuser }}"
+    state: present
+
+- name: Create System User
+  user:
+    name: "{{ appuser }}"
+    create_home: yes
+    groups: "{{ appuser }},docker"
+    state: present 
+
+- name: Add user to docker group
+  user:
+    name: "{{ appuser }}"
+    groups: docker
+    append: yes
+  become: yes

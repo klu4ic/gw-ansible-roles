@@ -1,0 +1,15 @@
+---
+# tasks file for roles/klu4ic.ci.qa.provisioning
+
+
+# Installing system aps
+- include: apps.yml
+  tags: [ apps ]
+
+# Creating system users and groups
+- include: users-groups.yml
+  tags: [ users-groups ]
+
+# Creating system files and folders
+- include: folder-files.yml
+  tags: [ folder-files ]

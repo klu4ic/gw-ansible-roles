@@ -1,0 +1,50 @@
+---
+
+- name: Creating Folder For jar Application
+  file:
+      path: /opt/web-ui 
+      group: "{{ appuser }}" 
+      state: directory 
+      mode: 0755 
+      owner: "{{ appuser }}" 
+
+- name: Creating Folder For jar Application in Docker container
+  file:
+      path: /opt/docker 
+      group: "{{ appuser }}" 
+      state: directory 
+      mode: 0664 
+      owner: "{{ appuser }}" 
+
+
+
+
+
+
+
+
+
+
+- name: 'Create the AWS config directory'
+  file:
+    path=/home/{{ appuser }}/.aws
+    state=directory
+    owner={{ appuser }}
+    group={{ appgroup }}
+    mode=0755
+
+- name: 'Copy AWS CLI config'
+  template:
+    src=aws_cli_config.j2
+    dest=/home/{{ appuser }}/.aws/config
+    owner={{ appuser }}
+    group={{ appgroup }}
+    mode=0600
+
+- name: 'Copy AWS CLI credentials'
+  template:
+    src=aws_cli_credentials.j2
+    dest=/home/{{ appuser }}/.aws/credentials
+    owner={{ appuser }}
+    group={{ appgroup }}
+    mode=0600
