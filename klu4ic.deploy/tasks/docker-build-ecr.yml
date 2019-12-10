@@ -1,0 +1,32 @@
+---
+
+- name: Copy Dockerfile
+  template: 
+    src: Dockerfile.j2  
+    dest: "{{ dockr_fls_path }}/Dockerfile"
+    owner: centos
+    group: docker
+
+
+- name: Log into ECR
+  become: centos
+  shell: "$(aws ecr get-login --no-include-email --region us-west-2)"
+  
+- name: Build an image and push it to a ECR
+  become: centos
+  docker_image:
+    build:
+        path: "{{ dockr_fls_path }}"
+    name: "{{ ecr_adress }}/{{ dockr_img_name }}:{{ buildtag }}"
+    force_tag: yes
+    push: yes
+    source: build
+
+- name: Add latest tag on image
+  become: centos
+  docker_image:
+    name: "{{ ecr_adress }}/{{ dockr_img_name }}:{{ buildtag }}"
+    repository: "{{ ecr_adress }}/{{ dockr_img_name }}:latest"
+    force_tag: yes
+    push: yes
+    source: local

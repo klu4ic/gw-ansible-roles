@@ -1,0 +1,51 @@
+---
+
+- name: Log into ECR
+  shell: "$(aws ecr get-login --no-include-email --region us-west-2)"
+  become_user: centos
+
+- name: Stop old container
+  docker_container:
+    name: "{{ container_name }}"
+    state: stopped
+  become_user: centos
+  ignore_errors: yes
+
+- name: remove old container
+
+  docker_container:
+    name: "{{ container_name }}"
+    state: absent
+  become_user: centos
+  ignore_errors: yes
+
+- name: Remove old image
+  
+  docker_image:
+    state: absent
+    force_absent: yes
+    name: "{{ ecr_adress }}/{{ container_name }}:latest"
+  become_user: centos
+  ignore_errors: yes
+  
+- name: pull an image if choise parameter of build number not send latest tag will be applied
+  docker_image:
+    name: "{{ ecr_adress }}/{{ container_name }}:{{ build_image_number }}"
+    source: pull
+  become_user: centos
+
+- name: Add latest tag on image
+  docker_image:
+    name: "{{ ecr_adress }}/{{ dockr_img_name }}:{{ build_image_number }}"
+    repository: "{{ ecr_adress }}/{{ dockr_img_name }}:latest"
+    force_tag: yes
+    push: yes
+    source: local
+  become_user: centos
+
+- name: Update ECS Service
+  shell: "aws ecs update-service --cluster ECS-Cluster1 --service web-ui-app-service --force-new-deployment"
+  become_user: centos
+
+
+

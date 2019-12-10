@@ -1,0 +1,19 @@
+---
+
+# Deploy jar artifact
+- include: jar-deploy.yml
+  tags: [ jar-deploy ]
+
+# Build and Push Docker image to ECR
+- include: docker-build-ecr.yml  
+  tags: [ docker-build ]
+
+# Deploy Docker Container to CI/QI Servers
+- include: docker-deploy.yml  
+  tags: [ docker-deploy ]
+
+# Deploy Docker Container to ECS
+- include: ecs-deploy.yml  
+  tags: [ ecs-deploy ]
+
+  

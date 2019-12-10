@@ -1,0 +1,43 @@
+---
+
+- name: Log into ECR
+  
+  shell: "$(aws ecr get-login --no-include-email --region us-west-2)"
+  become_user: "{{ appuser }}"
+
+
+- name: Stop old container
+  docker_container:
+    name: "{{ container_name }}"
+    state: stopped
+  become_user: "{{ appuser }}"
+  ignore_errors: yes
+
+- name: remove old container
+  docker_container:
+    name: "{{ container_name }}"
+    state: absent
+  become_user: "{{ appuser }}"
+  ignore_errors: yes
+
+- name: Remove old image
+  
+  docker_image:
+    state: absent
+    force_absent: yes
+    name: "{{ ecr_adress }}/{{ container_name }}:latest"
+  become_user: "{{ appuser }}"
+  ignore_errors: yes
+  
+- name: pull an image if choise parameter of build number not send latest tag will be applied
+  docker_image:
+    name: "{{ ecr_adress }}/{{ container_name }}:{{ build_image_number }}"
+    source: pull
+  become_user: "{{ appuser }}"
+
+- name: Create a data container
+  docker_container:
+    name: "{{ container_name }}"
+    image: "{{ ecr_adress }}/{{ container_name }}:{{ build_image_number }}"
+    published_ports: "{{ dckr_port }}:{{ dckr_port }}"
+  become_user: "{{ appuser }}"

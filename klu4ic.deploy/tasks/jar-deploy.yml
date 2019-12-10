@@ -1,0 +1,64 @@
+# Deploy jar artifact 
+---
+
+  - name: Clean old artifacts
+    file:
+      state: absent
+      path: "/opt/web-ui/web-ui.jar"
+
+
+  - name: Create log for Spring
+    file:
+      state: touch
+      path: /tmp/spring.log
+      mode: 0666
+      owner: "{{ appuser }}"
+      group: "{{ appgroup }}"
+    become: yes
+
+  - block:  # Get Latest artifact or artifact by choice
+  
+    - name: Get Artifact by Choise 
+      get_url: 
+        url: "{{ choise_artifact }}"
+        dest: /opt/web-ui/web-ui.jar
+        force: yes
+        owner: "{{ appuser }}"
+        group: "{{ appgroup }}"
+        mode: 0755
+      notify:
+        restart systemd
+
+    rescue:
+    - name: Get latest artifact if Artifact by choise is not present
+      maven_artifact: 
+        version: latest
+        group_id: "{{ group_id }}"
+        artifact_id: "{{ artifact_id}}"
+        repository_url: "{{ repository_url }}"
+        username: "{{ dtr_user }}"
+        password: "{{ dtr_pass }}"
+        dest: /opt/web-ui/web-ui.jar
+        owner: "{{ appuser }}"
+        group: "{{ appgroup }}"
+        mode: 0755
+      notify:
+        restart systemd
+  
+  
+  - name: "Create systemd service file"
+    become: yes
+    template:
+      src: service.j2
+      dest: "{{ sysd_script }}"
+      force: yes
+
+
+
+  # - name: Run web-ui & restart systemd
+  #   become: yes
+  #   systemd:
+  #     name: web-ui
+  #     state: restarted
+  #     daemon_reload: yes
+

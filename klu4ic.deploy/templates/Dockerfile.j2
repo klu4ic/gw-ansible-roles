@@ -1,0 +1,4 @@
+FROM {{ dckrfile_from }}
+ADD {{ dckrfile_jar_link }} {{ dckrfile_jar_name }}
+EXPOSE {{ dckr_port }} 
+ENTRYPOINT ["/usr/bin/java", "-jar", "/web-ui.jar", "--server.port={{ dckr_port }}"] 

@@ -1,0 +1,8 @@
+---
+# handlers file for klu4ic.deploy
+
+- name: restart systemd
+  systemd:
+    name: web-ui
+    state: restarted
+    daemon_reload: yes
